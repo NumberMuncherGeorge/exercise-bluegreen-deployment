@@ -1,0 +1,31 @@
+---
+services:
+  th3-server:
+    image: localhost/th3-server:${APP_VERSION:-latest}
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+      args:
+        - APP_VERSION=${APP_VERSION:-latest}
+    ports:
+      - 8080:8080
+
+  polling-client:
+    image: localhost/polling-client:${APP_VERSION:-latest}
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+      args:
+        - APP_VERSION=${APP_VERSION:-latest}
+    command:
+      - endpoints.local.yaml
+    # entrypoint: 
+    #   - /bin/bash
+    #   - -c
+    #   - while true; do sleep 30; done;
+    # volumes:
+    #   - ${PWD}/src/client:/workspace
+
+networks:
+  default:
+    name: client-test

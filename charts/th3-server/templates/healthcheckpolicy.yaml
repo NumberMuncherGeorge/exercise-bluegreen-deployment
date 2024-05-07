@@ -1,0 +1,25 @@
+{{- range .Values.deployments }}
+---
+apiVersion: networking.gke.io/v1
+kind: HealthCheckPolicy
+metadata:
+  name: {{ include "th3-server.fullname" $ }}-{{.id}}
+  labels:
+    {{- include "th3-server.labels" $ | nindent 4 }}
+    {{- include "th3-server.deploymentSelectorLabels" . | nindent 4 }}
+spec:
+  default:
+    checkIntervalSec: 30
+    timeoutSec: 2
+    healthyThreshold: 1
+    unhealthyThreshold: 3
+    config:
+      type: HTTP
+      httpHealthCheck:
+        port: {{ $.Values.service.port }}
+        requestPath: {{ $.Values.readinessProbe.httpGet.path }}
+  targetRef:
+    group: ""
+    kind: Service
+    name: {{ include "th3-server.fullname" $ }}-{{.id}}
+{{- end }}

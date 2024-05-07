@@ -1,0 +1,39 @@
+FROM python:3.10.14-slim-bookworm
+
+ARG USERNAME=app-server
+ARG USER_UID=1001
+ARG USER_GID=${USER_UID}
+
+ARG WORKSPACE=/workspace
+
+ARG APP_VERSION
+RUN test -n "${APP_VERSION}" || (echo "APP_VERSION  not set" && false)
+
+RUN apt-get -y update \
+    && apt-get -y upgrade \
+    && apt-get install -y sudo \
+    && apt-get clean
+
+RUN pip install --upgrade pip
+
+RUN groupadd --gid ${USER_GID} ${USERNAME} \
+    && useradd --uid ${USER_UID} --gid ${USER_GID} -m ${USERNAME} \
+    && echo ${USERNAME} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/${USERNAME} \
+    && chmod 0440 /etc/sudoers.d/${USERNAME}
+
+RUN mkdir ${WORKSPACE}
+COPY src/th3-server/ ${WORKSPACE}
+WORKDIR ${WORKSPACE}
+
+# Set the version variable in the server config
+RUN sed -i "s/__version__ = .*/__version__ = \"${APP_VERSION}\"/" th3-server.py
+
+# Install python dependencies
+RUN python -m pip install -r requirements.txt
+RUN chown -R ${USER_UID}.${USER_GID} ${WORKSPACE}
+
+USER ${USERNAME}
+
+EXPOSE 8080/tcp
+
+ENTRYPOINT [ "python", "th3-server.py" ]

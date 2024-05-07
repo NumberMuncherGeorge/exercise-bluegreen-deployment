@@ -1,0 +1,13 @@
+---
+endpoints:
+  - id: active-test
+    url: https://bluegreen.bliz.tgeorge.dev/version
+    headers: []
+  - id: blue-test
+    url: https://bluegreen.bliz.tgeorge.dev/version
+    headers:
+      X-BlueGreenTarget: blue
+  - id: green-test
+    url: https://bluegreen.bliz.tgeorge.dev/version
+    headers:
+      X-BlueGreenTarget: green

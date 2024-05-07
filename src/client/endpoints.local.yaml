@@ -1,0 +1,13 @@
+---
+endpoints:
+  - id: blue-test
+    url: http://th3-server:8080/version
+    headers:
+      X-BlueGreenTarget: blue
+  - id: green-test
+    url: http://th3-server:8080/version
+    headers:
+      X-BlueGreenTarget: green
+  - id: active-test
+    url: http://th3-server:8080/version
+    headers: []

@@ -1,0 +1,18 @@
+{{- range $.Values.deployments }}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "th3-server.fullname" $ }}-{{ .id }}-test-connection"
+  labels:
+    {{- include "th3-server.labels" $ | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "th3-server.fullname" $ }}-{{ .id }}:{{ $.Values.service.port }}/version']
+  restartPolicy: Never
+{{- end }}
